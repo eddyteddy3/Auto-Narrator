@@ -39,15 +39,6 @@
                                     <action selector="play:" destination="BYZ-38-t0r" eventType="touchUpInside" id="RdU-Gh-KTR"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eDf-2g-JuR">
-                                <rect key="frame" x="171" y="321" width="73" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Transcribe"/>
-                                <connections>
-                                    <action selector="play:" destination="BYZ-38-t0r" eventType="touchUpInside" id="plj-Ne-BDr"/>
-                                    <action selector="transcribeSpeech:" destination="BYZ-38-t0r" eventType="touchUpInside" id="fge-pP-oxm"/>
-                                </connections>
-                            </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="8ux-m7-3ot">
                                 <rect key="frame" x="20" y="398" width="374" height="397"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -56,11 +47,31 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0k8-o3-wSR">
+                                <rect key="frame" x="213" y="322" width="160" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Transcribe in Real Time"/>
+                                <connections>
+                                    <action selector="play:" destination="BYZ-38-t0r" eventType="touchUpInside" id="5YS-5D-7qR"/>
+                                    <action selector="transcribeLiveSpeech:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Szh-q9-nOu"/>
+                                    <action selector="transcribeSpeech:" destination="BYZ-38-t0r" eventType="touchUpInside" id="KUi-iM-k9A"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eDf-2g-JuR">
+                                <rect key="frame" x="77" y="322" width="73" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Transcribe"/>
+                                <connections>
+                                    <action selector="play:" destination="BYZ-38-t0r" eventType="touchUpInside" id="plj-Ne-BDr"/>
+                                    <action selector="transcribeSpeech:" destination="BYZ-38-t0r" eventType="touchUpInside" id="fge-pP-oxm"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="liveTranscribeButton" destination="0k8-o3-wSR" id="HtM-kS-xbR"/>
                         <outlet property="playButton" destination="NEw-eP-bmI" id="Wb6-G6-2dH"/>
                         <outlet property="recordButton" destination="zDK-7z-Rnv" id="BnJ-ll-TJq"/>
                         <outlet property="stopButton" destination="zDK-7z-Rnv" id="Ci6-yG-1LR"/>

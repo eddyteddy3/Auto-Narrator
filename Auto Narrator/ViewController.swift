@@ -8,19 +8,37 @@
 
 import UIKit
 import AVFoundation
+import Speech
 
 class ViewController: UIViewController, AVAudioPlayerDelegate {
     
     var avAudio: AVAudioPlayer?
     var audioRecorder: AVAudioRecorder?
     
+    @IBOutlet var textView: UITextView!
+    @IBOutlet var transcribe: UIButton!
     @IBOutlet var recordButton: UIButton!
     @IBOutlet var stopButton: UIButton!
     @IBOutlet var playButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        textView.isUserInteractionEnabled = false
         initAudioRecorder()
+        requestTranscribePermission()
+    }
+    
+    func requestTranscribePermission() {
+        SFSpeechRecognizer.requestAuthorization { (authStatus) in
+            DispatchQueue.main.async {
+                if authStatus == .authorized {
+                    self.transcribe.isHidden = false
+                    print("Good to go")
+                } else {
+                    print("Not granted")
+                }
+            }
+        }
     }
     
     func initAudioRecorder(){
@@ -48,6 +66,16 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
         }
     }
 
+    @IBAction func transcribeSpeech(_ sender: Any) {
+        let recognizer = SFSpeechRecognizer()
+        let request = SFSpeechURLRecognitionRequest(url: audioRecorder!.url)
+        
+        recognizer?.recognitionTask(with: request, resultHandler: { (result, error) in
+            print("Transcribed Audio: \(result?.bestTranscription.formattedString)")
+            self.textView.text = result?.bestTranscription.formattedString
+        })
+    }
+    
     @IBAction func record(_ sender: Any) {
         if audioRecorder?.isRecording == false {
             playButton.isEnabled = false

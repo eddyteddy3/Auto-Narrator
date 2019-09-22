@@ -15,6 +15,13 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
 
-
+    @IBAction func record(_ sender: Any) {
+    }
+    
+    @IBAction func stop(_ sender: Any) {
+    }
+    
+    @IBAction func play(_ sender: Any) {
+    }
 }
 

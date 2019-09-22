@@ -43,6 +43,11 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <connections>
+                        <outlet property="playButton" destination="NEw-eP-bmI" id="Wb6-G6-2dH"/>
+                        <outlet property="recordButton" destination="zDK-7z-Rnv" id="BnJ-ll-TJq"/>
+                        <outlet property="stopButton" destination="zDK-7z-Rnv" id="Ci6-yG-1LR"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>

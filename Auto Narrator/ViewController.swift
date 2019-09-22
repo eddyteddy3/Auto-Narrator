@@ -14,6 +14,7 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
     
     var avAudio: AVAudioPlayer?
     var audioRecorder: AVAudioRecorder?
+    let audioSession = AVAudioSession.sharedInstance()
     
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
     private var speechAudioBufferRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -31,8 +32,12 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
         super.viewDidLoad()
         textView.isUserInteractionEnabled = false
         textView.layer.borderWidth = 1
-        initAudioRecorder()
+        
         requestTranscribePermission()
+        
+        transcribe.isEnabled = false
+        playButton.isEnabled = false
+        stopButton.isEnabled = false
     }
     
     func requestTranscribePermission() {
@@ -49,7 +54,6 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
     }
     
     func initAudioRecorder(){
-        stopButton.isEnabled = false
         playButton.isEnabled = false
         
         let fileMng = FileManager.default
@@ -58,7 +62,6 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
         let audioFilePath = path[0].appendingPathComponent("sound.caf")
         let recordingSettings = [AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue, AVEncoderBitRateKey: 16, AVNumberOfChannelsKey: 2, AVSampleRateKey: 44100.0] as [String: Any]
         
-        let audioSession = AVAudioSession.sharedInstance()
         do {
             try audioSession.setCategory(.playAndRecord, mode: .default)
         } catch let error as NSError {
@@ -75,7 +78,6 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
 
     @IBAction func transcribeLiveSpeech(_ sender: Any) {
         playButton.isEnabled = false
-        stopButton.isEnabled = false
         transcribe.isEnabled = false
         recordButton.isEnabled = false
         liveTranscribeButton.isEnabled = false
@@ -92,9 +94,9 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
         if let recognitionTask = speechRecognitionTask {
             recognitionTask.cancel()
             self.speechRecognitionTask = nil
+            
         }
         
-        let audioSession = AVAudioSession.sharedInstance()
         do {
             try audioSession.setCategory(.record, mode: .default) //because we only want to record the audio
             //initializing the instance of speechAudioBuffer
@@ -105,7 +107,7 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
             }
             
             let inputNode = audioEngine.inputNode
-            recognitionRequest.shouldReportPartialResults = true
+            recognitionRequest.shouldReportPartialResults = true //to capture the result of each word/utterance
             
             speechRecognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest, resultHandler: { (result, error) in
                 var finished = false
@@ -117,15 +119,15 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
                 
                 if finished || error != nil {
                     self.audioEngine.stop()
-                    inputNode.removeTap(onBus: 0)
+                    inputNode.removeTap(onBus: 1)
                     self.speechAudioBufferRequest = nil
                     self.speechRecognitionTask = nil
                     self.liveTranscribeButton.isEnabled = true
                 }
             })
             
-            let recordingFormat = inputNode.outputFormat(forBus: 0)
-            inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { (buffer, time) in
+            let recordingFormat = inputNode.outputFormat(forBus: 1)
+            inputNode.installTap(onBus: 1, bufferSize: 1024, format: recordingFormat) { (buffer, time) in
                 self.speechAudioBufferRequest?.append(buffer)
             }
             
@@ -138,19 +140,17 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
     }
     
     @IBAction func transcribeSpeech(_ sender: Any) {
-        let recognizer = SFSpeechRecognizer()
+        //let recognizer = SFSpeechRecognizer()
         let request = SFSpeechURLRecognitionRequest(url: audioRecorder!.url)
         
-        recognizer?.recognitionTask(with: request, resultHandler: { (result, error) in
-            print("Transcribed Audio: \(result?.bestTranscription.formattedString)")
-            if result!.isFinal {
-               self.textView.text = result?.bestTranscription.formattedString
-            }
-            
+        speechRecognizer?.recognitionTask(with: request, resultHandler: { (result, error) in
+            self.textView.text = result?.bestTranscription.formattedString
         })
     }
     
     @IBAction func record(_ sender: Any) {
+        stopButton.isEnabled = true
+        initAudioRecorder()
         if audioRecorder?.isRecording == false {
             playButton.isEnabled = false
             stopButton.isEnabled = true
@@ -162,11 +162,18 @@ class ViewController: UIViewController, AVAudioPlayerDelegate {
         stopButton.isEnabled = false
         playButton.isEnabled = true
         recordButton.isEnabled = true
+        transcribe.isEnabled = true
         
         if audioRecorder?.isRecording == true {
             audioRecorder?.stop()
         } else {
             avAudio?.stop()
+        }
+        
+        if audioEngine.isRunning {
+            audioEngine.stop()
+            speechAudioBufferRequest?.endAudio()
+            liveTranscribeButton.isEnabled = true
         }
     }
     
